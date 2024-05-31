@@ -48,7 +48,146 @@ function Chat() {
           </IconContext.Provider>
         </div>
       </div>
-      <div className="center p-3 flex-1"></div>
+      <div className="center p-3 flex-1 flex flex-col gap-4 overflow-y-scroll scrollbar-custom">
+        {/* received */}
+        <div className="received flex gap-3 max-w-[70%] ">
+          <Avatar>
+            <AvatarImage
+              src="https://github.com/shadcn.png"
+              className="object-cover align-top"
+            />
+            <AvatarFallback>profile</AvatarFallback>
+          </Avatar>
+          <div className="texts flex-1 flex flex-col gap-1">
+            <p className="bg-gray-400 rounded-lg p-2">
+              Hello, How are you? Lorem ipsum dolor sit amet consectetur
+              adipisicing elit. Tenetur praesentium repellendus quas consequatur
+              iusto non dolorem ducimus obcaecati, maxime tempora ut veniam rem
+              eos ipsam quaerat, dolore ea voluptates fuga?
+            </p>
+            <span className="text-gray-200">2 min ago</span>
+          </div>
+        </div>
+        {/* {sent} */}
+        <div className="sent flex self-end gap-3 max-w-[70%]">
+          <div className="texts flex-1 flex flex-col gap-1">
+            <p className="bg-blue-600 p-2 rounded-lg">
+              Hello, I am fine Lorem ipsum dolor, sit amet consectetur
+              adipisicing elit. Omnis accusamus magni illum nam, ipsam, iure,
+              repudiandae tempore quod laboriosam necessitatibus eos! Blanditiis
+              officiis veniam quaerat delectus repudiandae! Tempora, eaque
+              itaque.
+            </p>
+            <span className="text-gray-200">4 min ago</span>
+          </div>
+        </div>
+        {/* received */}
+        <div className="received flex gap-3 max-w-[70%] ">
+          <Avatar>
+            <AvatarImage
+              src="https://github.com/shadcn.png"
+              className="object-cover align-top"
+            />
+            <AvatarFallback>profile</AvatarFallback>
+          </Avatar>
+          <div className="texts flex-1 flex flex-col gap-1">
+            <p className="bg-gray-400 rounded-lg p-2">
+              Hello, How are you? Lorem ipsum dolor sit amet consectetur
+              adipisicing elit. Tenetur praesentium repellendus quas consequatur
+              iusto non dolorem ducimus obcaecati, maxime tempora ut veniam rem
+              eos ipsam quaerat, dolore ea voluptates fuga?
+            </p>
+            <span className="text-gray-200">2 min ago</span>
+          </div>
+        </div>
+        {/* {sent} */}
+        <div className="sent flex self-end gap-3 max-w-[70%]">
+          <div className="texts flex-1 flex flex-col gap-1">
+            <img
+              src="https://images.pexels.com/photos/12954041/pexels-photo-12954041.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              alt="img"
+              className="rounded-lg w-full h-[300px] object-cover"
+            />
+            <p className="bg-blue-600 p-2 rounded-lg">
+              Hello, I am fine Lorem ipsum dolor, sit amet consectetur
+              adipisicing elit. Omnis accusamus magni illum nam, ipsam, iure,
+              repudiandae tempore quod laboriosam necessitatibus eos! Blanditiis
+              officiis veniam quaerat delectus repudiandae! Tempora, eaque
+              itaque.
+            </p>
+            <span className="text-gray-200">4 min ago</span>
+          </div>
+        </div>
+        {/* received */}
+        <div className="received flex gap-3 max-w-[70%] ">
+          <Avatar>
+            <AvatarImage
+              src="https://github.com/shadcn.png"
+              className="object-cover align-top"
+            />
+            <AvatarFallback>profile</AvatarFallback>
+          </Avatar>
+          <div className="texts flex-1 flex flex-col gap-1">
+            <p className="bg-gray-400 rounded-lg p-2">
+              Hello, How are you? Lorem ipsum dolor sit amet consectetur
+              adipisicing elit. Tenetur praesentium repellendus quas consequatur
+              iusto non dolorem ducimus obcaecati, maxime tempora ut veniam rem
+              eos ipsam quaerat, dolore ea voluptates fuga?
+            </p>
+            <span className="text-gray-200">2 min ago</span>
+          </div>
+        </div>
+        {/* {sent} */}
+        <div className="sent flex self-end gap-3 max-w-[70%]">
+          <div className="texts flex-1 flex flex-col gap-1">
+            <p className="bg-blue-600 p-2 rounded-lg">
+              Hello, I am fine Lorem ipsum dolor, sit amet consectetur
+              adipisicing elit. Omnis accusamus magni illum nam, ipsam, iure,
+              repudiandae tempore quod laboriosam necessitatibus eos! Blanditiis
+              officiis veniam quaerat delectus repudiandae! Tempora, eaque
+              itaque.
+            </p>
+            <span className="text-gray-200">4 min ago</span>
+          </div>
+        </div>
+        {/* received */}
+        <div className="received flex gap-3 max-w-[70%] ">
+          <Avatar>
+            <AvatarImage
+              src="https://github.com/shadcn.png"
+              className="object-cover align-top"
+            />
+            <AvatarFallback>profile</AvatarFallback>
+          </Avatar>
+          <div className="texts flex-1 flex flex-col gap-1">
+            <img
+              src="https://images.pexels.com/photos/12954041/pexels-photo-12954041.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              alt="img"
+              className="rounded-lg w-full h-[300px] object-cover"
+            />
+            <p className="bg-gray-400 rounded-lg p-2">
+              Hello, How are you? Lorem ipsum dolor sit amet consectetur
+              adipisicing elit. Tenetur praesentium repellendus quas consequatur
+              iusto non dolorem ducimus obcaecati, maxime tempora ut veniam rem
+              eos ipsam quaerat, dolore ea voluptates fuga?
+            </p>
+            <span className="text-gray-200">2 min ago</span>
+          </div>
+        </div>
+        {/* {sent} */}
+        <div className="sent flex self-end gap-3 max-w-[70%]">
+          <div className="texts flex-1 flex flex-col gap-1">
+            <p className="bg-blue-600 p-2 rounded-lg">
+              Hello, I am fine Lorem ipsum dolor, sit amet consectetur
+              adipisicing elit. Omnis accusamus magni illum nam, ipsam, iure,
+              repudiandae tempore quod laboriosam necessitatibus eos! Blanditiis
+              officiis veniam quaerat delectus repudiandae! Tempora, eaque
+              itaque.
+            </p>
+            <span className="text-gray-200">4 min ago</span>
+          </div>
+        </div>
+      </div>
       <div className="bottom flex items-center justify-between gap-3 p-2 border-t-[1px] border-t-gray-400">
         <div className="icons flex items-center gap-3">
           <IconContext.Provider
