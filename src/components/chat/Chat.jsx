@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { IconContext } from "react-icons";
 import { IoMdCall } from "react-icons/io";
@@ -16,6 +16,13 @@ function Chat() {
   const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
   };
+
+  const endRef = useRef(null);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
   return (
     <div className="chat border-r-[1px] border-r-gray-400 flex-col flex">
       <div className="top p-2 flex justify-between border-b-[1px] border-b-gray-400">
@@ -187,6 +194,7 @@ function Chat() {
             <span className="text-gray-200">4 min ago</span>
           </div>
         </div>
+        <div ref={endRef}></div>
       </div>
       <div className="bottom flex items-center justify-between gap-3 p-2 border-t-[1px] border-t-gray-400">
         <div className="icons flex items-center gap-3">

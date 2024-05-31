@@ -21,7 +21,6 @@ function Detail() {
         <h2 className="font-bold text-xl">Aryan Bhati</h2>
         <p className="text-center">
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae
-          tempora corrupti amet quae placeat
         </p>
       </div>
       <div className="info p-3">
