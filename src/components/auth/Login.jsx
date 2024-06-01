@@ -1,5 +1,6 @@
 import { Icons } from "@/components/icons";
 import { Button } from "../ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Form,
   FormControl,
@@ -14,28 +15,52 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "@/components/ui/use-toast";
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const FormSchema = z.object({
   email: z.string().email({
     message: "Valid email address is required. ",
   }),
+  password: z.string().nonempty({
+    message: "Password is required.",
+  }),
 });
 export default function Login() {
+  const { toast } = useToast();
   const form = useForm({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      username: "",
-    },
   });
-  function onSubmit(data) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  async function onSubmit(data) {
+    console.log(data);
+    // toast({
+    //   title: "You submitted the following values:",
+    //   description: (
+    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+    //     </pre>
+    //   ),
+    // });
+    try {
+      const res = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      console.log(res);
+      toast({
+        title: "Login Successfull!",
+        description: "Logged In successfully!",
+        status: "success",
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "An error occurred",
+        description: "Unable to create account",
+        status: "error",
+      });
+    }
   }
 
   return (

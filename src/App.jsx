@@ -4,7 +4,7 @@ import { Chat, List, Detail, Login, CreateAccount } from "./components/index";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
-  const user = true;
+  const user = false;
   return (
     <div className="h-[90vh] w-[90vw] text-white bg-[#172065c1] backdrop-blur-xl backdrop-saturate-200 border-2 rounded-sm  border-[#ffffffcf] flex">
       {user ? (

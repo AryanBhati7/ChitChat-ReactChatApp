@@ -1,14 +1,16 @@
 import * as React from "react";
-import { cn } from "@/lib/utils";
-import { Icons } from "@/components/icons";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import avatarPlaceholder from "@/assets/avatar.png";
 import { useToast } from "@/components/ui/use-toast";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import upload from "@/lib/upload";
 
 import {
   Form,
@@ -59,7 +61,7 @@ export default function Createaccount({ className, ...props }) {
     setAvatar({ file, url });
   };
 
-  function onSubmit(data) {
+  async function onSubmit(data) {
     data.avatar = avatar.file;
     console.log(data);
     const dataWithAvatarName = { ...data };
@@ -69,16 +71,53 @@ export default function Createaccount({ className, ...props }) {
       ? avatar.file.name
       : "No file selected";
 
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            {JSON.stringify(dataWithAvatarName, null, 2)}
-          </code>
-        </pre>
-      ),
-    });
+    // toast({
+    //   title: "You submitted the following values:",
+    //   description: (
+    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+    //       <code className="text-white">
+    //         {JSON.stringify(dataWithAvatarName, null, 2)}
+    //       </code>
+    //     </pre>
+    //   ),
+    // });
+    setIsLoading(true);
+    try {
+      //Calling firebase auth here
+      const res = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      //Calling firebase Storage for handling avatar image
+      const avatarUrl = await upload(data.avatar);
+      //Calling firebase firestore here
+      const user = res.user;
+      await setDoc(doc(db, "users", user.uid), {
+        username: data.username,
+        email: data.email,
+        avatar: avatarUrl,
+        id: user.uid,
+        blocked: [],
+      }); // Add user to firestore
+      await setDoc(doc(db, "userchats", user.uid), {
+        chats: [],
+      }); //add Userchats
+      setIsLoading(false);
+      toast({
+        title: "Account created",
+        description: "Your account has been created successfully",
+        status: "success",
+      });
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+      toast({
+        title: "An error occurred",
+        description: "Unable to create account",
+        status: "error",
+      });
+    }
   }
 
   return (
