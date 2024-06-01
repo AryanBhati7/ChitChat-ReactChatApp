@@ -15,7 +15,10 @@ function Detail() {
     <div className="details flex-1 overflow-y-scroll scrollbar-custom">
       <div className="user flex flex-col p-3 gap-2 justify-center items-center border-b-[1px] border-b-gray-400 pb-2">
         <Avatar className="w-3/12 h-3/12">
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage
+            src="https://github.com/shadcn.png"
+            className="object-cover"
+          />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <h2 className="font-bold text-xl">Aryan Bhati</h2>
