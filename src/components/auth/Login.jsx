@@ -32,7 +32,6 @@ export default function Login() {
     resolver: zodResolver(FormSchema),
   });
   async function onSubmit(data) {
-    console.log(data);
     // toast({
     //   title: "You submitted the following values:",
     //   description: (
@@ -42,12 +41,8 @@ export default function Login() {
     //   ),
     // });
     try {
-      const res = await signInWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      );
-      console.log(res);
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+
       toast({
         title: "Login Successfull!",
         description: "Logged In successfully!",

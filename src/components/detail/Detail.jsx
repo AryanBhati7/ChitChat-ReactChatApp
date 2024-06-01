@@ -9,6 +9,7 @@ import {
 import { MdDownloadForOffline } from "react-icons/md";
 import { IoLogOutOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/firebase";
 
 function Detail() {
   return (
@@ -120,7 +121,10 @@ function Detail() {
         <Button variant="destructive" className="w-full">
           Block User
         </Button>
-        <Button className="bg-blue-600 text-white flex gap-3 w-full hover:bg-blue-400">
+        <Button
+          onClick={() => auth.signOut()}
+          className="bg-blue-600 text-white flex gap-3 w-full hover:bg-blue-400"
+        >
           <IoLogOutOutline /> Log out
         </Button>
       </div>
