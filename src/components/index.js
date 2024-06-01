@@ -5,4 +5,14 @@ import Detail from "./detail/Detail";
 import Userinfo from "./list/userInfo/Userinfo";
 import CreateAccount from "./auth/CreateAccount";
 import Login from "./auth/Login";
-export { Chatlist, Chat, List, Detail, Userinfo, CreateAccount, Login };
+import SkeletonLoading from "./SkeletonLoading";
+export {
+  Chatlist,
+  Chat,
+  List,
+  Detail,
+  Userinfo,
+  CreateAccount,
+  Login,
+  SkeletonLoading,
+};

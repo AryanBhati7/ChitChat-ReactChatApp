@@ -4,7 +4,6 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -14,11 +13,10 @@ import { Input } from "../ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "@/components/ui/use-toast";
 import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
-import { googleProvider } from "@/lib/firebase";
+import { googleProvider, twitterProvider } from "@/lib/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
@@ -42,10 +40,9 @@ export default function Login() {
       const result = await signInWithPopup(auth, googleProvider);
       // The signed-in user info.
       const user = result.user;
-
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
-
+      console.log(user);
       if (!userDoc.exists()) {
         await setDoc(doc(db, "users", user.uid), {
           username: user.displayName,
@@ -72,6 +69,45 @@ export default function Login() {
       });
     }
   }
+
+  async function twitterLogin(event) {
+    event.preventDefault();
+    try {
+      const result = await signInWithPopup(auth, twitterProvider);
+      // The signed-in user info.
+      const user = result.user;
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+      console.log(user);
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, "users", user.uid), {
+          username: user.displayName,
+          email: user.email,
+          avatar: user.photoURL,
+          id: user.uid,
+          blocked: [],
+        }); // Add user to firestore
+        await setDoc(doc(db, "userchats", user.uid), {
+          chats: [],
+        }); //add Userchats
+      }
+      toast({
+        title: "Login Successfull!",
+        description: "Logged In successfully!",
+        status: "success",
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "An error occurred",
+        description: "Unable to create account",
+        status: "error",
+      });
+    }
+  }
+
+  async function facebookLogin(event) {}
+  async function githubLogin(event) {}
   async function onSubmit(data) {
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
@@ -142,13 +178,23 @@ export default function Login() {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-6">
-          <Button variant="outline">
-            <Icons.gitHub className="mr-2 h-4 w-4" />
-            Github
+          <Button variant="outline" onClick={twitterLogin}>
+            <Icons.twitter className="mr-2 h-4 w-4" />
+            Twitter
           </Button>
           <Button variant="outline" onClick={googleLogin}>
             <Icons.google className="mr-2 h-4 w-4" />
             Google
+          </Button>
+        </div>
+        <div className="grid grid-cols-2 gap-6">
+          <Button variant="outline" onClick={facebookLogin}>
+            <Icons.facebook className="mr-2 h-6 w-6" />
+            Facebook
+          </Button>
+          <Button variant="outline" onClick={githubLogin}>
+            <Icons.gitHub className="mr-2 h-4 w-4" />
+            Github
           </Button>
         </div>
       </form>

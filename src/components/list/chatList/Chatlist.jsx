@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { IoSearch } from "react-icons/io5";
 import { MdAdd } from "react-icons/md";
@@ -17,9 +17,40 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import AddUser from "../AddUser";
+import { useUserStore } from "@/store/userStore";
+import { db } from "@/lib/firebase";
+
+import { onSnapshot, doc, getDoc } from "firebase/firestore";
+import { set } from "react-hook-form";
 
 function Chatlist() {
+  const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
+  const { currentUser } = useUserStore();
+
+  useEffect(() => {
+    const unSub = onSnapshot(
+      doc(db, "userchats", currentUser.id),
+      async (res) => {
+        const items = res.data().chats;
+
+        const promises = items.map(async (item) => {
+          const userDocRef = doc(db, "users", item.receiverId);
+          const userDocSnap = await getDoc(userDocRef);
+
+          const user = userDocSnap.data();
+          return { ...items, user };
+        });
+
+        const chatData = await Promise.all(promises);
+
+        setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
+      }
+    );
+
+    return () => unSub();
+  }, [currentUser.id]);
+
   return (
     <div className="flex-1 overflow-y-scroll scrollbar-custom">
       <Dialog>
@@ -44,109 +75,25 @@ function Chatlist() {
         </div>
       </Dialog>
       <div className="chatlist ">
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span className="font-semibold text-md">Janhvi Bhati</span>
-            <p>Hello Hi</p>
+        {chats.map((chat) => (
+          <div
+            key={chat.chatId}
+            className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer"
+          >
+            <Avatar>
+              <AvatarImage
+                src={chat.user.avatar || "https://github.com/shadcn.png"}
+              />
+              <AvatarFallback>{chat.user.username}</AvatarFallback>
+            </Avatar>
+            <div className="texts">
+              <span className="font-semibold text-md">
+                {chat.user.username}
+              </span>
+              <p>{chat.lastMessage}</p>
+            </div>
           </div>
-        </div>
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              className="object-cover"
-            />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span>Janhvi Bhati</span>
-            <p>Hello Hi</p>
-          </div>
-        </div>
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span>Janhvi Bhati</span>
-            <p>Hello Hi</p>
-          </div>
-        </div>
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span>Janhvi Bhati</span>
-            <p>Hello Hi</p>
-          </div>
-        </div>
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span>Janhvi Bhati</span>
-            <p>Hello Hi</p>
-          </div>
-        </div>
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span>Janhvi Bhati</span>
-            <p>Hello Hi</p>
-          </div>
-        </div>
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span>Janhvi Bhati</span>
-            <p>Hello Hi</p>
-          </div>
-        </div>
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span>Janhvi Bhati</span>
-            <p>Hello Hi</p>
-          </div>
-        </div>
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span>Janhvi Bhati</span>
-            <p>Hello Hi</p>
-          </div>
-        </div>
-        <div className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div className="texts">
-            <span>Janhvi Bhati</span>
-            <p>Hello Hi</p>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
