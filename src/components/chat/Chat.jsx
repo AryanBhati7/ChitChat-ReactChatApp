@@ -41,14 +41,15 @@ function Chat() {
     const url = URL.createObjectURL(file);
     setImg({ file, url });
   };
-  const { chatId, user } = useChatStore();
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
+    useChatStore();
   const { currentUser } = useUserStore();
 
   const endRef = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
+  }, [chat]);
 
   useEffect(() => {
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
@@ -58,7 +59,8 @@ function Chat() {
     return () => unSub();
   }, [chatId]);
 
-  const handleSend = async () => {
+  const handleSend = async (e) => {
+    e.preventDefault();
     if (text === "") return;
 
     let imgUrl = null;
@@ -118,13 +120,15 @@ function Chat() {
         <div className="user flex items-center gap-4">
           <Avatar>
             <AvatarImage
-              src="https://github.com/shadcn.png"
+              src={user?.avatar || "https://github.com/shadcn.png"}
               className="object-cover"
             />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback>{user?.username || "useravatar"}</AvatarFallback>
           </Avatar>
           <div className="user-text">
-            <span className="text-lg font-bold">Demo User</span>
+            <span className="text-lg font-bold">
+              {user?.username || "ChitChat User"}
+            </span>
             <p className="text-gray-200 text-md">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Laud
             </p>
@@ -182,7 +186,13 @@ function Chat() {
         ))}
         <div ref={endRef}></div>
       </div>
-      <div className="bottom flex items-center justify-between gap-3 p-2 border-t-[1px] border-t-gray-400">
+      <div
+        className={`bottom flex items-center  gap-3 p-2 border-t-[1px] border-t-gray-400 ${
+          isCurrentUserBlocked || isReceiverBlocked
+            ? "opacity-50 pointer-events-none cursor-not-allowed"
+            : ""
+        }`}
+      >
         <div className="icons flex items-center gap-3">
           <IconContext.Provider
             value={{
@@ -204,33 +214,49 @@ function Chat() {
             <TiMicrophone />
           </IconContext.Provider>
         </div>
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="bg-gray-500 flex-1 focus:border-none active:border-none focus:outline-none  rounded-sm p-2"
-          onChange={(e) => setText(e.target.value)}
-          value={text}
-        />
-        <div className="emoji relative">
-          <IconContext.Provider
-            value={{
-              color: "white",
-              className: "cursor-pointer",
-              size: "1.3em",
-            }}
-          >
-            <BsEmojiSmileFill onClick={() => setOpen((prev) => !prev)} />
-          </IconContext.Provider>
-          <div className="picker absolute bottom-[50px]">
-            <EmojiPicker open={open} onEmojiClick={handleEmoji} />
-          </div>
-        </div>
-        <Button
-          onClick={handleSend}
-          className="bg-blue-600 text-white hover:bg-gray-400"
+        <form
+          onSubmit={handleSend}
+          className="flex justify-between flex-1 items-center gap-4"
         >
-          Send
-        </Button>
+          <input
+            type="text"
+            placeholder={
+              isCurrentUserBlocked || isReceiverBlocked
+                ? "You cannot send message to this user"
+                : "Type a message..."
+            }
+            className="bg-gray-500 flex-1 focus:border-none active:border-none focus:outline-none  rounded-sm p-2"
+            onChange={(e) => setText(e.target.value)}
+            value={text}
+            disabled={isCurrentUserBlocked || isReceiverBlocked}
+          />
+          <div className="emoji relative">
+            <IconContext.Provider
+              value={{
+                color: "white",
+                className: "cursor-pointer",
+                size: "1.3em",
+              }}
+            >
+              <BsEmojiSmileFill onClick={() => setOpen((prev) => !prev)} />
+            </IconContext.Provider>
+            <div className="picker absolute bottom-[50px]">
+              <EmojiPicker open={open} onEmojiClick={handleEmoji} />
+            </div>
+          </div>
+          <Button
+            type="submit"
+            onClick={handleSend}
+            className={`${
+              isCurrentUserBlocked || isReceiverBlocked
+                ? "bg-light-blue cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-gray-400"
+            }`}
+            disabled={isCurrentUserBlocked || isReceiverBlocked}
+          >
+            Send
+          </Button>
+        </form>
       </div>
     </div>
   );

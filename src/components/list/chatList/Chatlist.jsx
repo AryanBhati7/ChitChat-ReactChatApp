@@ -26,12 +26,11 @@ import { useChatStore } from "@/store/chatStore";
 
 function Chatlist() {
   const [chats, setChats] = useState([]);
+  const [input, setInput] = useState("");
   const [addMode, setAddMode] = useState(false);
   const { currentUser } = useUserStore();
   const { chatId, changeChat } = useChatStore();
-  const ForwardedMdAdd = React.forwardRef((props, ref) => (
-    <MdAdd ref={ref} {...props} />
-  ));
+
   const handleSelect = async (chat) => {
     const userChats = chats.map((item) => {
       const { user, ...rest } = item;
@@ -77,6 +76,10 @@ function Chatlist() {
     return () => unSub();
   }, [currentUser.id]);
 
+  const filteredChats = chats.filter((chat) =>
+    chat.user.username.toLowerCase().includes(input.toLowerCase())
+  );
+
   return (
     <div className="flex-1 overflow-y-scroll scrollbar-custom">
       <Dialog>
@@ -84,6 +87,8 @@ function Chatlist() {
           <div className="searchbar flex-1 flex  bg-gray-400 items-center rounded-lg p-1">
             <IoSearch className="h-6 w-6" />
             <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
               placeholder="Search"
               className="pl-2 bg-transparent border-none focus:border-none active:border-none focus:outline-none w-full"
             />
@@ -101,7 +106,7 @@ function Chatlist() {
         </div>
       </Dialog>
       <div className="chatlist ">
-        {chats.map((chat) => (
+        {filteredChats.map((chat) => (
           <div
             key={chat.chatId}
             onClick={() => handleSelect(chat)}
@@ -114,14 +119,20 @@ function Chatlist() {
           >
             <Avatar>
               <AvatarImage
-                src={chat.user.avatar || "https://github.com/shadcn.png"}
+                src={
+                  chat.user.blocked.includes(currentUser.id)
+                    ? "https://github.com/shadcn.png"
+                    : chat.user.avatar
+                }
                 className="object-cover"
               />
               <AvatarFallback>{chat.user.username}</AvatarFallback>
             </Avatar>
             <div className="texts">
               <span className="font-semibold text-md">
-                {chat.user.username}
+                {chat.user.blocked.includes(currentUser.id)
+                  ? "Blocked"
+                  : chat.user.username}
               </span>
               <p>{chat.lastMessage}</p>
             </div>

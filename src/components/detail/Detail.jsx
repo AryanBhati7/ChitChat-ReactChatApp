@@ -10,19 +10,45 @@ import { MdDownloadForOffline } from "react-icons/md";
 import { IoLogOutOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/firebase";
+import { useChatStore } from "@/store/chatStore";
+import { arrayRemove } from "firebase/firestore";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useUserStore } from "@/store/userStore";
 
 function Detail() {
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
+    useChatStore();
+  const { currentUser } = useUserStore();
+
+  const handleBlock = async () => {
+    console.log("clicked block");
+    if (!user) return;
+
+    const userDocRef = doc(db, "users", currentUser?.id);
+    try {
+      await updateDoc(userDocRef, {
+        blocked: isReceiverBlocked ? arrayRemove(user.id) : arrayUnion(user.id),
+      });
+      changeBlock();
+    } catch (error) {
+      console.log(error);
+    }
+    changeBlock(chatId, !isCurrentUserBlocked, isReceiverBlocked);
+  };
   return (
     <div className="details flex-1 overflow-y-scroll scrollbar-custom">
       <div className="user flex flex-col p-3 gap-2 justify-center items-center border-b-[1px] border-b-gray-400 pb-2">
         <Avatar className="w-3/12 h-3/12">
           <AvatarImage
-            src="https://github.com/shadcn.png"
+            src={user?.avatar || "https://github.com/shadcn.png"}
             className="object-cover"
           />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>{user?.username}</AvatarFallback>
         </Avatar>
-        <h2 className="font-bold text-xl">Aryan Bhati</h2>
+        <h2 className="font-bold text-xl">
+          {user?.username || "Chitchat User"}
+        </h2>
         <p className="text-center">
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae
         </p>
@@ -118,8 +144,12 @@ function Detail() {
         </Accordion>
       </div>
       <div className="buttons flex flex-col gap-5 p-3">
-        <Button variant="destructive" className="w-full">
-          Block User
+        <Button onClick={handleBlock} variant="destructive" className="w-full">
+          {isCurrentUserBlocked
+            ? "You are Blocked"
+            : isReceiverBlocked
+            ? "Unblock"
+            : "Block"}
         </Button>
         <Button
           onClick={() => auth.signOut()}
