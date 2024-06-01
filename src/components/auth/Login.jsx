@@ -17,6 +17,10 @@ import { z } from "zod";
 import { toast } from "@/components/ui/use-toast";
 import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
+import { googleProvider } from "@/lib/firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const FormSchema = z.object({
   email: z.string().email({
@@ -31,15 +35,44 @@ export default function Login() {
   const form = useForm({
     resolver: zodResolver(FormSchema),
   });
+
+  async function googleLogin(event) {
+    event.preventDefault();
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      // The signed-in user info.
+      const user = result.user;
+
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, "users", user.uid), {
+          username: user.displayName,
+          email: user.email,
+          avatar: user.photoURL,
+          id: user.uid,
+          blocked: [],
+        }); // Add user to firestore
+        await setDoc(doc(db, "userchats", user.uid), {
+          chats: [],
+        }); //add Userchats
+      }
+      toast({
+        title: "Login Successfull!",
+        description: "Logged In successfully!",
+        status: "success",
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "An error occurred",
+        description: "Unable to create account",
+        status: "error",
+      });
+    }
+  }
   async function onSubmit(data) {
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // });
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
 
@@ -113,7 +146,7 @@ export default function Login() {
             <Icons.gitHub className="mr-2 h-4 w-4" />
             Github
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={googleLogin}>
             <Icons.google className="mr-2 h-4 w-4" />
             Google
           </Button>
