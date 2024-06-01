@@ -13,10 +13,10 @@ import { auth } from "@/lib/firebase";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { useUserStore } from "@/store/userStore";
-import { Icons } from "@/components/icons";
+import { useChatStore } from "@/store/chatStore";
 function App() {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
-
+  const { chatId } = useChatStore();
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       fetchUserInfo(user?.uid);
@@ -34,8 +34,8 @@ function App() {
       {currentUser ? (
         <>
           <List />
-          <Chat />
-          <Detail />
+          {chatId && <Chat />}
+          {chatId && <Detail />}
         </>
       ) : (
         <div className="flex gap-4 p-4 justify-evenly w-full items-center">

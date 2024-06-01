@@ -20,13 +20,39 @@ import AddUser from "../AddUser";
 import { useUserStore } from "@/store/userStore";
 import { db } from "@/lib/firebase";
 
-import { onSnapshot, doc, getDoc } from "firebase/firestore";
+import { onSnapshot, doc, getDoc, updateDoc } from "firebase/firestore";
 import { set } from "react-hook-form";
+import { useChatStore } from "@/store/chatStore";
 
 function Chatlist() {
   const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
   const { currentUser } = useUserStore();
+  const { chatId, changeChat } = useChatStore();
+  const ForwardedMdAdd = React.forwardRef((props, ref) => (
+    <MdAdd ref={ref} {...props} />
+  ));
+  const handleSelect = async (chat) => {
+    const userChats = chats.map((item) => {
+      const { user, ...rest } = item;
+      return rest;
+    });
+    const chatIndex = userChats.findIndex(
+      (item) => item.chatId === chat.chatId
+    );
+    userChats[chatIndex].isSeen = true;
+
+    const userChatsRef = doc(db, "userchats", currentUser.id);
+
+    try {
+      await updateDoc(userChatsRef, {
+        chats: userChats,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    changeChat(chat.chatId, chat.user);
+  };
 
   useEffect(() => {
     const unSub = onSnapshot(
@@ -39,7 +65,7 @@ function Chatlist() {
           const userDocSnap = await getDoc(userDocRef);
 
           const user = userDocSnap.data();
-          return { ...items, user };
+          return { ...item, user };
         });
 
         const chatData = await Promise.all(promises);
@@ -67,7 +93,7 @@ function Chatlist() {
           >
             <div onClick={() => setAddMode((prev) => !prev)}>
               <DialogTrigger asChild>
-                {addMode ? <TiMinus /> : <MdAdd />}
+                {addMode ? <TiMinus /> : "+"}
               </DialogTrigger>
             </div>
           </IconContext.Provider>
@@ -78,11 +104,18 @@ function Chatlist() {
         {chats.map((chat) => (
           <div
             key={chat.chatId}
+            onClick={() => handleSelect(chat)}
             className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer"
+            style={
+              chat?.isSeen
+                ? { backgroundColor: "transparent" }
+                : { backgroundColor: "blue" }
+            }
           >
             <Avatar>
               <AvatarImage
                 src={chat.user.avatar || "https://github.com/shadcn.png"}
+                className="object-cover"
               />
               <AvatarFallback>{chat.user.username}</AvatarFallback>
             </Avatar>

@@ -7,21 +7,84 @@ import { BsEmojiSmileFill, BsCameraFill } from "react-icons/bs";
 import { TiMicrophone } from "react-icons/ti";
 import { FaImage } from "react-icons/fa6";
 import EmojiPicker from "emoji-picker-react";
-
+import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
-
+import {
+  doc,
+  getDoc,
+  onSnapshot,
+  arrayUnion,
+  updateDoc,
+} from "firebase/firestore";
+import { useChatStore } from "@/store/chatStore";
+import { useUserStore } from "@/store/userStore";
+import { useToast } from "@/components/ui/use-toast";
 function Chat() {
+  const toast = useToast();
+  const [chat, setChat] = useState();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
   };
+  const { chatId, user } = useChatStore();
+  const { currentUser } = useUserStore();
 
   const endRef = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
+
+  useEffect(() => {
+    const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+      setChat(res.data());
+    });
+
+    return () => unSub();
+  }, [chatId]);
+
+  const handleSend = async () => {
+    if (text === "") return;
+    try {
+      await updateDoc(doc(db, "chats", chatId), {
+        messages: arrayUnion({
+          senderId: currentUser.id,
+          text,
+          createdAt: new Date(),
+        }),
+      });
+
+      const userIDs = [currentUser.id, user.id];
+      userIDs.forEach(async (id) => {
+        const userChatsRef = doc(db, "userchats", id);
+        const userChatsSnapshot = await getDoc(userChatsRef);
+
+        if (userChatsSnapshot.exists()) {
+          const userChatsData = userChatsSnapshot.data();
+          const chatIndex = userChatsData.chats.findIndex(
+            (c) => c.chatId === chatId
+          );
+
+          userChatsData.chats[chatIndex].lastMessage = text;
+          userChatsData.chats[chatIndex].isSeen =
+            id === currentUser.id ? true : false;
+          userChatsData.chats[chatIndex].updatedAt = Date.now();
+
+          await updateDoc(userChatsRef, {
+            chats: userChatsData.chats,
+          });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        message: "Failed to send message",
+        type: "error",
+      });
+    }
+  };
 
   return (
     <div className="chat border-r-[1px] border-r-gray-400 flex-col flex">
@@ -56,144 +119,50 @@ function Chat() {
         </div>
       </div>
       <div className="center p-3 flex-1 flex flex-col gap-4 overflow-y-scroll scrollbar-custom">
-        {/* received */}
-        <div className="received flex gap-3 max-w-[70%] ">
-          <Avatar>
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              className="object-cover align-top"
-            />
-            <AvatarFallback>profile</AvatarFallback>
-          </Avatar>
-          <div className="texts flex-1 flex flex-col gap-1">
-            <p className="bg-gray-400 rounded-lg p-2">
-              Hello, How are you? Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Tenetur praesentium repellendus quas consequatur
-              iusto non dolorem ducimus obcaecati, maxime tempora ut veniam rem
-              eos ipsam quaerat, dolore ea voluptates fuga?
-            </p>
-            <span className="text-gray-200">2 min ago</span>
+        {/* {chat?.messages?.map((message) => (
+          <div
+            key={message.createdAt}
+            className="received flex gap-3 max-w-[70%] "
+          >
+            <Avatar>
+              <AvatarImage
+                src="https://github.com/shadcn.png"
+                className="object-cover align-top"
+              />
+              <AvatarFallback>profile</AvatarFallback>
+            </Avatar>
+            <div className="texts flex-1 flex flex-col gap-1">
+              {message.img && (
+                <img
+                  src={message.img}
+                  alt="img"
+                  className="rounded-lg w-full h-[300px] object-cover"
+                />
+              )}
+              <p className="bg-gray-400 rounded-lg p-2">{message.text}</p>
+              <span className="text-gray-200">{message}</span>
+            </div>
           </div>
-        </div>
-        {/* {sent} */}
-        <div className="sent flex self-end gap-3 max-w-[70%]">
-          <div className="texts flex-1 flex flex-col gap-1">
-            <p className="bg-blue-600 p-2 rounded-lg">
-              Hello, I am fine Lorem ipsum dolor, sit amet consectetur
-              adipisicing elit. Omnis accusamus magni illum nam, ipsam, iure,
-              repudiandae tempore quod laboriosam necessitatibus eos! Blanditiis
-              officiis veniam quaerat delectus repudiandae! Tempora, eaque
-              itaque.
-            </p>
-            <span className="text-gray-200">4 min ago</span>
+        ))} */}
+
+        {chat?.messages?.map((message) => (
+          <div
+            key={message.createdAt}
+            className="sent flex self-end gap-3 max-w-[70%]"
+          >
+            <div className="texts flex-1 flex flex-col gap-1">
+              {message.img && (
+                <img
+                  src={message.img}
+                  alt="img"
+                  className="rounded-lg w-full h-[300px] object-cover"
+                />
+              )}
+              <p className="bg-blue-600 p-2 rounded-lg">{message.text}</p>
+              <span className="text-gray-200">4 min ago</span>
+            </div>
           </div>
-        </div>
-        {/* received */}
-        <div className="received flex gap-3 max-w-[70%] ">
-          <Avatar>
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              className="object-cover align-top"
-            />
-            <AvatarFallback>profile</AvatarFallback>
-          </Avatar>
-          <div className="texts flex-1 flex flex-col gap-1">
-            <p className="bg-gray-400 rounded-lg p-2">
-              Hello, How are you? Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Tenetur praesentium repellendus quas consequatur
-              iusto non dolorem ducimus obcaecati, maxime tempora ut veniam rem
-              eos ipsam quaerat, dolore ea voluptates fuga?
-            </p>
-            <span className="text-gray-200">2 min ago</span>
-          </div>
-        </div>
-        {/* {sent} */}
-        <div className="sent flex self-end gap-3 max-w-[70%]">
-          <div className="texts flex-1 flex flex-col gap-1">
-            <img
-              src="https://images.pexels.com/photos/12954041/pexels-photo-12954041.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-              alt="img"
-              className="rounded-lg w-full h-[300px] object-cover"
-            />
-            <p className="bg-blue-600 p-2 rounded-lg">
-              Hello, I am fine Lorem ipsum dolor, sit amet consectetur
-              adipisicing elit. Omnis accusamus magni illum nam, ipsam, iure,
-              repudiandae tempore quod laboriosam necessitatibus eos! Blanditiis
-              officiis veniam quaerat delectus repudiandae! Tempora, eaque
-              itaque.
-            </p>
-            <span className="text-gray-200">4 min ago</span>
-          </div>
-        </div>
-        {/* received */}
-        <div className="received flex gap-3 max-w-[70%] ">
-          <Avatar>
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              className="object-cover align-top"
-            />
-            <AvatarFallback>profile</AvatarFallback>
-          </Avatar>
-          <div className="texts flex-1 flex flex-col gap-1">
-            <p className="bg-gray-400 rounded-lg p-2">
-              Hello, How are you? Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Tenetur praesentium repellendus quas consequatur
-              iusto non dolorem ducimus obcaecati, maxime tempora ut veniam rem
-              eos ipsam quaerat, dolore ea voluptates fuga?
-            </p>
-            <span className="text-gray-200">2 min ago</span>
-          </div>
-        </div>
-        {/* {sent} */}
-        <div className="sent flex self-end gap-3 max-w-[70%]">
-          <div className="texts flex-1 flex flex-col gap-1">
-            <p className="bg-blue-600 p-2 rounded-lg">
-              Hello, I am fine Lorem ipsum dolor, sit amet consectetur
-              adipisicing elit. Omnis accusamus magni illum nam, ipsam, iure,
-              repudiandae tempore quod laboriosam necessitatibus eos! Blanditiis
-              officiis veniam quaerat delectus repudiandae! Tempora, eaque
-              itaque.
-            </p>
-            <span className="text-gray-200">4 min ago</span>
-          </div>
-        </div>
-        {/* received */}
-        <div className="received flex gap-3 max-w-[70%] ">
-          <Avatar>
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              className="object-cover align-top"
-            />
-            <AvatarFallback>profile</AvatarFallback>
-          </Avatar>
-          <div className="texts flex-1 flex flex-col gap-1">
-            <img
-              src="https://images.pexels.com/photos/12954041/pexels-photo-12954041.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-              alt="img"
-              className="rounded-lg w-full h-[300px] object-cover"
-            />
-            <p className="bg-gray-400 rounded-lg p-2">
-              Hello, How are you? Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Tenetur praesentium repellendus quas consequatur
-              iusto non dolorem ducimus obcaecati, maxime tempora ut veniam rem
-              eos ipsam quaerat, dolore ea voluptates fuga?
-            </p>
-            <span className="text-gray-200">2 min ago</span>
-          </div>
-        </div>
-        {/* {sent} */}
-        <div className="sent flex self-end gap-3 max-w-[70%]">
-          <div className="texts flex-1 flex flex-col gap-1">
-            <p className="bg-blue-600 p-2 rounded-lg">
-              Hello, I am fine Lorem ipsum dolor, sit amet consectetur
-              adipisicing elit. Omnis accusamus magni illum nam, ipsam, iure,
-              repudiandae tempore quod laboriosam necessitatibus eos! Blanditiis
-              officiis veniam quaerat delectus repudiandae! Tempora, eaque
-              itaque.
-            </p>
-            <span className="text-gray-200">4 min ago</span>
-          </div>
-        </div>
+        ))}
         <div ref={endRef}></div>
       </div>
       <div className="bottom flex items-center justify-between gap-3 p-2 border-t-[1px] border-t-gray-400">
@@ -231,7 +200,10 @@ function Chat() {
             <EmojiPicker open={open} onEmojiClick={handleEmoji} />
           </div>
         </div>
-        <Button className="bg-blue-600 text-white hover:bg-gray-400">
+        <Button
+          onClick={handleSend}
+          className="bg-blue-600 text-white hover:bg-gray-400"
+        >
           Send
         </Button>
       </div>
