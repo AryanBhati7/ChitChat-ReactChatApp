@@ -19,13 +19,27 @@ import {
 import { useChatStore } from "@/store/chatStore";
 import { useUserStore } from "@/store/userStore";
 import { useToast } from "@/components/ui/use-toast";
+import upload from "@/lib/upload";
+import SentMessage from "./SentMessage";
+import ReceivedMessage from "./ReceivedMessage";
+
 function Chat() {
   const toast = useToast();
   const [chat, setChat] = useState();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
+  const [img, setImg] = React.useState({
+    file: null,
+    url: "",
+  });
   const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
+  };
+  const handleImage = (e) => {
+    if (e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const url = URL.createObjectURL(file);
+    setImg({ file, url });
   };
   const { chatId, user } = useChatStore();
   const { currentUser } = useUserStore();
@@ -46,12 +60,19 @@ function Chat() {
 
   const handleSend = async () => {
     if (text === "") return;
+
+    let imgUrl = null;
     try {
+      if (img.file) {
+        imgUrl = await upload(img.file);
+      }
+
       await updateDoc(doc(db, "chats", chatId), {
         messages: arrayUnion({
           senderId: currentUser.id,
           text,
           createdAt: new Date(),
+          ...(imgUrl && { img: imgUrl }),
         }),
       });
 
@@ -84,6 +105,11 @@ function Chat() {
         type: "error",
       });
     }
+    setImg({
+      file: null,
+      url: "",
+    });
+    setText("");
   };
 
   return (
@@ -98,7 +124,7 @@ function Chat() {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="user-text">
-            <span className="text-lg font-bold">Suman Bhati</span>
+            <span className="text-lg font-bold">Demo User</span>
             <p className="text-gray-200 text-md">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Laud
             </p>
@@ -146,22 +172,13 @@ function Chat() {
         ))} */}
 
         {chat?.messages?.map((message) => (
-          <div
-            key={message.createdAt}
-            className="sent flex self-end gap-3 max-w-[70%]"
-          >
-            <div className="texts flex-1 flex flex-col gap-1">
-              {message.img && (
-                <img
-                  src={message.img}
-                  alt="img"
-                  className="rounded-lg w-full h-[300px] object-cover"
-                />
-              )}
-              <p className="bg-blue-600 p-2 rounded-lg">{message.text}</p>
-              <span className="text-gray-200">4 min ago</span>
-            </div>
-          </div>
+          <React.Fragment key={message.createdAt}>
+            {message.senderId === currentUser?.id ? (
+              <SentMessage message={message} />
+            ) : (
+              <ReceivedMessage message={message} />
+            )}
+          </React.Fragment>
         ))}
         <div ref={endRef}></div>
       </div>
@@ -174,7 +191,15 @@ function Chat() {
               size: "1.3em",
             }}
           >
-            <FaImage />
+            <label htmlFor="file">
+              <FaImage />
+            </label>
+            <input
+              type="file"
+              id="file"
+              style={{ display: "none" }}
+              onChange={handleImage}
+            ></input>
             <BsCameraFill />
             <TiMicrophone />
           </IconContext.Provider>
