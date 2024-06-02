@@ -131,7 +131,8 @@ function Chat({ className }) {
               {user?.username || "ChitChat User"}
             </span>
             <p className="text-gray-200 text-md">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Laud
+              Life is like riding a bicycle. To keep your balance, you must keep
+              moving.
             </p>
           </div>
         </div>
