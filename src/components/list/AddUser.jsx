@@ -192,7 +192,7 @@ function AddUser() {
                 src={user.avatar || "https://github.com/shadcn.png"}
                 className="object-cover"
               />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback>{user?.username || "avatar"}</AvatarFallback>
             </Avatar>
             <div className="username">{user?.username}</div>
           </div>

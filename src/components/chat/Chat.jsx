@@ -44,7 +44,6 @@ function Chat() {
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
     useChatStore();
   const { currentUser } = useUserStore();
-
   const endRef = useRef(null);
 
   useEffect(() => {
@@ -154,11 +153,10 @@ function Chat() {
             {message.senderId === currentUser?.id ? (
               <SentMessage message={message} />
             ) : (
-              <ReceivedMessage message={message} />
+              <ReceivedMessage message={message} sender={user} />
             )}
           </React.Fragment>
         ))}
-        <div ref={endRef}></div>
         {img.url.length > 0 && (
           <div className="max-w-3/12 max-h-4/12 h-[20rem] w-[20rem]">
             <img
@@ -168,6 +166,7 @@ function Chat() {
             />
           </div>
         )}
+        <div ref={endRef}></div>
       </div>
       <div
         className={`bottom flex items-center  gap-3 p-2 border-t-[1px] border-t-gray-400 ${
@@ -208,7 +207,7 @@ function Chat() {
                 ? "You cannot send message to this user"
                 : "Type a message..."
             }
-            className="bg-gray-500 flex-1 focus:border-none active:border-none focus:outline-none  rounded-sm p-2"
+            className="bg-[#111928] flex-1 focus:border-none active:border-none focus:outline-none  rounded-sm p-2"
             onChange={(e) => setText(e.target.value)}
             value={text}
             disabled={isCurrentUserBlocked || isReceiverBlocked}

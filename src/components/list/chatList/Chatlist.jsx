@@ -7,9 +7,8 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import AddUser from "../AddUser";
 import { useUserStore } from "@/store/userStore";
 import { db } from "@/lib/firebase";
-
+import { BsThreeDotsVertical, BsDot } from "react-icons/bs";
 import { onSnapshot, doc, getDoc, updateDoc } from "firebase/firestore";
-import { set } from "react-hook-form";
 import { useChatStore } from "@/store/chatStore";
 
 function Chatlist() {
@@ -66,7 +65,6 @@ function Chatlist() {
   const filteredChats = chats.filter((chat) =>
     chat.user.username.toLowerCase().includes(input.toLowerCase())
   );
-  console.log(filteredChats);
 
   return (
     <div className="flex-1 overflow-y-scroll scrollbar-custom">
@@ -85,7 +83,7 @@ function Chatlist() {
             value={{ color: "white", className: "h-6 w-6 cursor-pointer" }}
           >
             <DialogTrigger asChild>
-              <IoIosAddCircle />
+              <IoIosAddCircle className="ml-2" />
             </DialogTrigger>
           </IconContext.Provider>
           <AddUser />
@@ -96,32 +94,32 @@ function Chatlist() {
           <div
             key={chat.chatId}
             onClick={() => handleSelect(chat)}
-            className="chat p-3 flex items-center gap-3 border-b-gray-300 border-b-[1px] cursor-pointer"
-            style={
-              chat?.isSeen
-                ? { backgroundColor: "transparent" }
-                : { backgroundColor: "blue" }
-            }
+            className="chat p-3 flex justify-between items-center border-b-gray-300 border-b-[1px] cursor-pointer"
           >
-            <Avatar>
-              <AvatarImage
-                src={
-                  chat.user.blocked.includes(currentUser.id)
-                    ? "https://github.com/shadcn.png"
-                    : chat.user.avatar
-                }
-                className="object-cover"
-              />
-              <AvatarFallback>{chat.user.username}</AvatarFallback>
-            </Avatar>
-            <div className="texts">
-              <span className="font-semibold text-md">
-                {chat.user.blocked.includes(currentUser.id)
-                  ? "Blocked"
-                  : chat.user.username}
-              </span>
-              <p>{chat.lastMessage}</p>
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <AvatarImage
+                  src={
+                    chat.user.blocked.includes(currentUser.id)
+                      ? "https://github.com/shadcn.png"
+                      : chat.user.avatar
+                  }
+                  className="object-cover"
+                />
+                <AvatarFallback>{chat.user.username}</AvatarFallback>
+              </Avatar>
+              <div className="texts">
+                <span className="font-semibold text-md">
+                  {chat.user.blocked.includes(currentUser.id)
+                    ? "Blocked"
+                    : chat.user.username}
+                </span>
+                <p>{chat.lastMessage}</p>
+              </div>
             </div>
+            {chat?.isSeen === false ? (
+              <span className="bg-white text-white text-xs px-1 rounded-full w-4 h-4"></span>
+            ) : null}
           </div>
         ))}
       </div>

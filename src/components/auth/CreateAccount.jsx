@@ -21,7 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "@/components/ui/use-toast";
+import { useUserStore } from "@/store/userStore";
 
 const FormSchema = z.object({
   username: z
@@ -42,6 +42,7 @@ const FormSchema = z.object({
 
 export default function Createaccount({ className, ...props }) {
   const { toast } = useToast();
+  const { fetchUserInfo } = useUserStore();
   const [isLoading, setIsLoading] = React.useState(false);
   const [avatar, setAvatar] = React.useState({
     file: null,
@@ -71,16 +72,6 @@ export default function Createaccount({ className, ...props }) {
       ? avatar.file.name
       : "No file selected";
 
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">
-    //         {JSON.stringify(dataWithAvatarName, null, 2)}
-    //       </code>
-    //     </pre>
-    //   ),
-    // });
     setIsLoading(true);
     try {
       //Calling firebase auth here
@@ -103,12 +94,15 @@ export default function Createaccount({ className, ...props }) {
       await setDoc(doc(db, "userchats", user.uid), {
         chats: [],
       }); //add Userchats
-      setIsLoading(false);
       toast({
         title: "Account created",
-        description: "Your account has been created successfully",
+        description:
+          "Your account has been created successfully with following details",
+
         status: "success",
       });
+      await fetchUserInfo(user.uid);
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       console.log(error);

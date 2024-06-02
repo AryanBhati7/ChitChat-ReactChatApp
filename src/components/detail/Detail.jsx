@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Accordion,
@@ -15,12 +15,38 @@ import { arrayRemove } from "firebase/firestore";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useUserStore } from "@/store/userStore";
+import { useToast } from "@/components/ui/use-toast";
+import { onSnapshot } from "firebase/firestore";
 
 function Detail() {
-  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
-    useChatStore();
+  const [images, setImages] = React.useState([]);
+  const { toast } = useToast();
+  const {
+    chatId,
+    user,
+    isCurrentUserBlocked,
+    isReceiverBlocked,
+    changeBlock,
+    resetChat,
+  } = useChatStore();
   const { currentUser } = useUserStore();
 
+  useEffect(() => {
+    const chatDocRef = doc(db, "chats", chatId);
+    const unsubscribe = onSnapshot(chatDocRef, (doc) => {
+      if (doc.exists()) {
+        const chatData = doc.data();
+        const imageUrls = chatData.messages
+          .filter((message) => message.img)
+          .map((message) => message.img);
+
+        setImages(imageUrls);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [chatId]);
+  console.log(images);
   const handleBlock = async () => {
     console.log("clicked block");
     if (!user) return;
@@ -31,10 +57,18 @@ function Detail() {
         blocked: isReceiverBlocked ? arrayRemove(user.id) : arrayUnion(user.id),
       });
       changeBlock();
+      toast({
+        title: "User Blocked successfully",
+        description: "Now, they can't send you messages.",
+        status: "success",
+      });
     } catch (error) {
       console.log(error);
     }
-    changeBlock(chatId, !isCurrentUserBlocked, isReceiverBlocked);
+  };
+  const handleLogout = () => {
+    auth.signOut();
+    resetChat();
   };
   return (
     <div className="details flex-1 overflow-y-scroll scrollbar-custom">
@@ -59,87 +93,34 @@ function Detail() {
             <AccordionTrigger className="hover:no-underline">
               Chat Settings
             </AccordionTrigger>
-            <AccordionContent>
-              Yes. It adheres to the WAI-ARIA design pattern.
-            </AccordionContent>
+            <AccordionContent>Currently in Development 🧑‍💻</AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2" className="border-none">
             <AccordionTrigger className="hover:no-underline">
               Privacy & Help
             </AccordionTrigger>
-            <AccordionContent>
-              Yes. It adheres to the WAI-ARIA design pattern.
-            </AccordionContent>
+            <AccordionContent>Currently in Development 🧑‍💻</AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-3" className="border-none">
             <AccordionTrigger className="hover:no-underline">
               Shared Photos
             </AccordionTrigger>
-            <AccordionContent className="photos flex flex-col gap-3">
-              <div className="photo-container flex items-center justify-between">
-                <div className="photoitem flex gap-3">
-                  <img
-                    src="https://images.pexels.com/photos/20541532/pexels-photo-20541532/free-photo-of-a-person-walking-down-a-street-in-front-of-a-large-building.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                    alt="img"
-                    className="rounded-sm w-8 h-8"
-                  />
-                  <span className="text-md">photo_256456.jpg</span>
-                </div>
-                <MdDownloadForOffline className="h-5 w-5 cursor-pointer" />
-              </div>
-              <div className="photo-container flex items-center justify-between">
-                <div className="photoitem flex gap-3">
-                  <img
-                    src="https://images.pexels.com/photos/20541532/pexels-photo-20541532/free-photo-of-a-person-walking-down-a-street-in-front-of-a-large-building.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                    alt="img"
-                    className="rounded-sm w-8 h-8"
-                  />
-                  <span className="text-md">photo_256456.jpg</span>
-                </div>
-                <MdDownloadForOffline className="h-5 w-5 cursor-pointer" />
-              </div>
-              <div className="photo-container flex items-center justify-between">
-                <div className="photoitem flex gap-3">
-                  <img
-                    src="https://images.pexels.com/photos/20541532/pexels-photo-20541532/free-photo-of-a-person-walking-down-a-street-in-front-of-a-large-building.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                    alt="img"
-                    className="rounded-sm w-8 h-8"
-                  />
-                  <span className="text-md">photo_256456.jpg</span>
-                </div>
-                <MdDownloadForOffline className="h-5 w-5 cursor-pointer" />
-              </div>
-              <div className="photo-container flex items-center justify-between">
-                <div className="photoitem flex gap-3">
-                  <img
-                    src="https://images.pexels.com/photos/20541532/pexels-photo-20541532/free-photo-of-a-person-walking-down-a-street-in-front-of-a-large-building.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                    alt="img"
-                    className="rounded-sm w-8 h-8 "
-                  />
-                  <span className="text-md">photo_256456.jpg</span>
-                </div>
-                <MdDownloadForOffline className="h-5 w-5 cursor-pointer" />
-              </div>
-              <div className="photo-container flex items-center justify-between">
-                <div className="photoitem flex gap-3">
-                  <img
-                    src="https://images.pexels.com/photos/20541532/pexels-photo-20541532/free-photo-of-a-person-walking-down-a-street-in-front-of-a-large-building.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                    alt="img"
-                    className="rounded-sm w-8 h-8"
-                  />
-                  <span className="text-md">photo_256456.jpg</span>
-                </div>
-                <MdDownloadForOffline className="h-5 w-5 cursor-pointer" />
-              </div>
+            <AccordionContent className="photos flex w-full p-2 items-center flex-wrap gap-5">
+              {images.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt="shared"
+                  className="w-32 h-32 rounded-lg"
+                />
+              ))}
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-4" className="border-none">
             <AccordionTrigger className="hover:no-underline">
               Shared Files
             </AccordionTrigger>
-            <AccordionContent>
-              Yes. It adheres to the WAI-ARIA design pattern.
-            </AccordionContent>
+            <AccordionContent>Currently in Development 🧑‍💻</AccordionContent>
           </AccordionItem>
         </Accordion>
       </div>
@@ -152,7 +133,7 @@ function Detail() {
             : "Block"}
         </Button>
         <Button
-          onClick={() => auth.signOut()}
+          onClick={handleLogout}
           className="bg-blue-600 text-white flex gap-3 w-full hover:bg-blue-400"
         >
           <IoLogOutOutline /> Log out

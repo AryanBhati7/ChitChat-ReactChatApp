@@ -18,8 +18,11 @@ function App() {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
   const { chatId } = useChatStore();
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      fetchUserInfo(user?.uid);
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      console.log("Auth State changed");
+      console.log("user", user);
+
+      await fetchUserInfo(user?.uid);
     });
 
     return () => {
@@ -30,7 +33,8 @@ function App() {
   if (isLoading) return <SkeletonLoading />;
 
   return (
-    <div className="h-[90vh] w-[90vw] text-white bg-[#172065c1] backdrop-blur-xl backdrop-saturate-200 border-2 rounded-sm  border-[#ffffffcf] flex">
+    <div className="h-[90vh] w-[90vw] text-white bg-[rgba(23,32,101,0.75)] backdrop-blur-[20px] border-2 rounded-sm border-[#ffffffcf] flex">
+      {" "}
       {currentUser ? (
         <>
           <List />

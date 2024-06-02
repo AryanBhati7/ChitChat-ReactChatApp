@@ -16,7 +16,7 @@ function Userinfo() {
             src={currentUser.avatar || "https://github.com/shadcn.png"}
             className="object-cover"
           />
-          <AvatarFallback>profilePic</AvatarFallback>
+          <AvatarFallback>{currentUser.username || "avatar"}</AvatarFallback>
         </Avatar>
         <div className="username text-xl">{currentUser.username}</div>
       </div>
