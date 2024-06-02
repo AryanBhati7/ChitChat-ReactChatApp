@@ -86,7 +86,8 @@ function Detail({ className }) {
           {user?.username || "Chitchat User"}
         </h2>
         <p className="text-center">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae
+          Life is like riding a bicycle. To keep your balance, you must keep
+          moving.
         </p>
       </div>
       <div className="info p-3">
@@ -108,14 +109,15 @@ function Detail({ className }) {
               Shared Photos
             </AccordionTrigger>
             <AccordionContent className="photos flex w-full p-2 items-center flex-wrap gap-5">
-              {images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt="shared"
-                  className="w-32 h-32 rounded-lg"
-                />
-              ))}
+              {images &&
+                images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt="shared"
+                    className="w-32 h-32 rounded-lg"
+                  />
+                ))}
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-4" className="border-none">

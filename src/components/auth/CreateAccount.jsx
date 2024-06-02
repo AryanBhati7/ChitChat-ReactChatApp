@@ -119,7 +119,7 @@ export default function Createaccount({ className, ...props }) {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-4/12 space-y-4 text-black bg-white p-4 rounded-md "
+          className={`space-y-4 text-black bg-white p-4 rounded-md ${className}`}
         >
           <h2 className="text-xl font-bold">Create your account</h2>
           <p> Enter your information below to create your account</p>

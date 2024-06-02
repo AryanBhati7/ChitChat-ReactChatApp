@@ -42,10 +42,10 @@ function App() {
           {chatId && <Detail className="" />}
         </>
       ) : (
-        <div className="flex gap-4 p-4 justify-evenly w-full items-center">
-          <CreateAccount />
+        <div className="flex flex-col sm:flex-row gap-4 p-4 justify-evenly w-full items-center">
+          <CreateAccount className={"sm:w-4/12 w-full"} />
           <div className="separator h-[80%] w-[2px] bg-gray-600"></div>
-          <Login />
+          <Login className={"w-full sm:w-4/12"} />
         </div>
       )}
       <Toaster />

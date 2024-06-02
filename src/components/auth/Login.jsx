@@ -34,7 +34,7 @@ const FormSchema = z.object({
     message: "Password is required.",
   }),
 });
-export default function Login() {
+export default function Login({ className }) {
   const { fetchUserInfo } = useUserStore();
   const { toast } = useToast();
   const form = useForm({
@@ -99,7 +99,7 @@ export default function Login() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-4/12 space-y-3 text-black bg-white p-4 rounded-md "
+        className={`space-y-3 text-black bg-white p-4 rounded-md ${className}`}
       >
         <h2 className="text-xl font-bold">Login to your Account</h2>
         <p> Enter your Email and password to Login</p>
