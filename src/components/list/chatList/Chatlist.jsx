@@ -63,7 +63,7 @@ function Chatlist() {
   }, [currentUser.id]);
 
   const filteredChats = chats.filter((chat) =>
-    chat.user?.username.toLowerCase().includes(input.toLowerCase())
+    chat.user?.username?.toLowerCase().includes(input.toLowerCase())
   );
 
   return (
