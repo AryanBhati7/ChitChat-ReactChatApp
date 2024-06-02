@@ -5,6 +5,8 @@ import {
   getAuth,
   GoogleAuthProvider,
   TwitterAuthProvider,
+  FacebookAuthProvider,
+  GithubAuthProvider,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
@@ -23,5 +25,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
 export const googleProvider = new GoogleAuthProvider();
 export const twitterProvider = new TwitterAuthProvider();
+export const facebookProvider = new FacebookAuthProvider();
+export const githubProvider = new GithubAuthProvider();
 export const db = getFirestore();
 export const storage = getStorage();
