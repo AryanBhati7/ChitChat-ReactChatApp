@@ -19,9 +19,6 @@ function App() {
   const { chatId } = useChatStore();
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
-      console.log("Auth State changed");
-      console.log("user", user);
-
       await fetchUserInfo(user?.uid);
     });
 

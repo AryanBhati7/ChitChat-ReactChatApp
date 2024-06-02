@@ -44,6 +44,7 @@ export default function Login({ className }) {
   async function socialLogin(provider) {
     try {
       const result = await signInWithPopup(auth, provider);
+      console.log(result);
       const user = result.user;
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
@@ -64,6 +65,7 @@ export default function Login({ className }) {
         description: "Logged In successfully!",
         status: "success",
       });
+      console.log(user, "before fetch");
       fetchUserInfo(user.uid);
     } catch (error) {
       console.log(error);
