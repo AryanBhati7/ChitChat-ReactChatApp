@@ -30,18 +30,17 @@ function App() {
   if (isLoading) return <SkeletonLoading />;
 
   return (
-    <div className="h-[90vh] w-[90vw] text-white bg-[rgba(23,32,101,0.75)] backdrop-blur-[20px] border-2 rounded-sm border-[#ffffffcf] flex">
-      {" "}
+    <div className="sm:h-[90vh] h-auto w-[90vw] mt-5 sm:mt-0 text-white bg-[rgba(23,32,101,0.75)] backdrop-blur-[20px] border-2 rounded-sm border-[#ffffffcf] flex flex-col sm:flex-row">
       {currentUser ? (
         <>
           <List />
-          {chatId && <Chat className="md:flex hidden" />}
+          {chatId && <Chat className="" />}
           {chatId && <Detail className="" />}
         </>
       ) : (
-        <div className="flex flex-col sm:flex-row gap-4 p-4 justify-evenly w-full items-center">
+        <div className=" flex flex-col sm:flex-row gap-4 p-4 justify-evenly w-full items-center">
           <CreateAccount className={"sm:w-4/12 w-full"} />
-          <div className="separator h-[80%] w-[2px] bg-gray-600"></div>
+          <div className="sm:flex hidden separator h-[80%] w-[2px] bg-gray-600"></div>
           <Login className={"w-full sm:w-4/12"} />
         </div>
       )}

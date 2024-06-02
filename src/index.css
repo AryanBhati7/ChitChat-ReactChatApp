@@ -100,6 +100,13 @@ body {
   -moz-animation: AnimationName 5s ease infinite;
   animation: AnimationName 5s ease infinite;
 }
+@media (max-width: 768px) {
+  body {
+    height: auto;
+
+    overflow-x: hidden;
+  }
+}
 
 @keyframes AnimationName {
   0%,
