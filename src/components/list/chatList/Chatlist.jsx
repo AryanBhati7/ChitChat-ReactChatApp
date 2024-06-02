@@ -1,21 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
 import { IoSearch } from "react-icons/io5";
-import { MdAdd } from "react-icons/md";
-import { TiMinus } from "react-icons/ti";
+import { IoIosAddCircle } from "react-icons/io";
 import { IconContext } from "react-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import AddUser from "../AddUser";
 import { useUserStore } from "@/store/userStore";
 import { db } from "@/lib/firebase";
@@ -27,7 +15,6 @@ import { useChatStore } from "@/store/chatStore";
 function Chatlist() {
   const [chats, setChats] = useState([]);
   const [input, setInput] = useState("");
-  const [addMode, setAddMode] = useState(false);
   const { currentUser } = useUserStore();
   const { chatId, changeChat } = useChatStore();
 
@@ -79,6 +66,7 @@ function Chatlist() {
   const filteredChats = chats.filter((chat) =>
     chat.user.username.toLowerCase().includes(input.toLowerCase())
   );
+  console.log(filteredChats);
 
   return (
     <div className="flex-1 overflow-y-scroll scrollbar-custom">
@@ -96,11 +84,9 @@ function Chatlist() {
           <IconContext.Provider
             value={{ color: "white", className: "h-6 w-6 cursor-pointer" }}
           >
-            <div onClick={() => setAddMode((prev) => !prev)}>
-              <DialogTrigger asChild>
-                {addMode ? <TiMinus /> : "+"}
-              </DialogTrigger>
-            </div>
+            <DialogTrigger asChild>
+              <IoIosAddCircle />
+            </DialogTrigger>
           </IconContext.Provider>
           <AddUser />
         </div>

@@ -149,32 +149,6 @@ function Chat() {
         </div>
       </div>
       <div className="center p-3 flex-1 flex flex-col gap-4 overflow-y-scroll scrollbar-custom">
-        {/* {chat?.messages?.map((message) => (
-          <div
-            key={message.createdAt}
-            className="received flex gap-3 max-w-[70%] "
-          >
-            <Avatar>
-              <AvatarImage
-                src="https://github.com/shadcn.png"
-                className="object-cover align-top"
-              />
-              <AvatarFallback>profile</AvatarFallback>
-            </Avatar>
-            <div className="texts flex-1 flex flex-col gap-1">
-              {message.img && (
-                <img
-                  src={message.img}
-                  alt="img"
-                  className="rounded-lg w-full h-[300px] object-cover"
-                />
-              )}
-              <p className="bg-gray-400 rounded-lg p-2">{message.text}</p>
-              <span className="text-gray-200">{message}</span>
-            </div>
-          </div>
-        ))} */}
-
         {chat?.messages?.map((message) => (
           <React.Fragment key={message.createdAt}>
             {message.senderId === currentUser?.id ? (
@@ -185,6 +159,15 @@ function Chat() {
           </React.Fragment>
         ))}
         <div ref={endRef}></div>
+        {img.url.length > 0 && (
+          <div className="max-w-3/12 max-h-4/12 h-[20rem] w-[20rem]">
+            <img
+              src={img.url}
+              alt="selectedImg"
+              className="w-full h-full rounded-sm object-cover"
+            />
+          </div>
+        )}
       </div>
       <div
         className={`bottom flex items-center  gap-3 p-2 border-t-[1px] border-t-gray-400 ${

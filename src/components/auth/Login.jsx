@@ -109,6 +109,7 @@ export default function Login() {
   async function facebookLogin(event) {}
   async function githubLogin(event) {}
   async function onSubmit(data) {
+    console.log(data);
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
 
@@ -121,7 +122,7 @@ export default function Login() {
       console.log(error);
       toast({
         title: "An error occurred",
-        description: "Unable to create account",
+        description: "Unable to Login to your Account",
         status: "error",
       });
     }

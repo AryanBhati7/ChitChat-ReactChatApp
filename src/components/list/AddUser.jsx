@@ -9,6 +9,7 @@ import {
   where,
 } from "firebase/firestore";
 import { getDocs } from "firebase/firestore";
+import { getDoc } from "firebase/firestore";
 import { doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Input } from "../ui/input";
@@ -22,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -58,7 +60,25 @@ function AddUser() {
       const querySnapShot = await getDocs(q);
 
       if (!querySnapShot.empty) {
-        setUser(querySnapShot.docs[0].data());
+        const user = querySnapShot.docs[0].data();
+        if (user.id !== currentUser.id) {
+          if (!user.blocked.includes(currentUser.id)) {
+            // Fetch all documents from userchats
+            const userChatsRef = collection(db, "userchats");
+            const userChatsSnapShot = await getDocs(userChatsRef);
+
+            // Filter documents where chatId is equal to user.id
+            const userChat = userChatsSnapShot.docs.find((doc) => {
+              const data = doc.data().userchats; // Assuming userchats is the array of objects
+              return data && data.some((item) => item.chatId === user.id);
+            });
+
+            if (!userChat) {
+              // If userChat is undefined, it means the userId is not used as chatId yet
+              setUser(user);
+            }
+          }
+        }
       }
     } catch (error) {
       console.log(error);
@@ -74,6 +94,22 @@ function AddUser() {
     const chatRef = collection(db, "chats");
     const userChatsRef = collection(db, "userchats");
     try {
+      // Fetch current user's chats
+      const currentUserChatsDoc = await getDoc(
+        doc(userChatsRef, currentUser.id)
+      );
+      const currentUserChats = currentUserChatsDoc.data().chats;
+
+      // Check if user is already in the chat
+      if (currentUserChats.some((chat) => chat.receiverId === user.id)) {
+        toast({
+          title: "User already added",
+          description: "This user is already in the chatlist",
+          status: "error",
+        });
+        return;
+      }
+
       // Add user to chat
       const newChatRef = doc(chatRef);
 
@@ -99,14 +135,14 @@ function AddUser() {
       });
       toast({
         title: "User added successfully",
-        description: "User has been added to the chat", // Add user to chat description
+        description: "User has been added to the chat",
         status: "success",
       });
     } catch (error) {
       console.log(error);
       toast({
         title: "An error occurred",
-        description: "Unable to add user to chat",
+        description: "Unable to add user",
         status: "error",
       });
     }
@@ -160,7 +196,9 @@ function AddUser() {
             </Avatar>
             <div className="username">{user?.username}</div>
           </div>
-          <Button onClick={handleAdd}>Add User</Button>
+          <DialogClose asChild>
+            <Button onClick={handleAdd}>Add User</Button>
+          </DialogClose>
         </div>
       )}
     </DialogContent>
