@@ -23,7 +23,7 @@ import upload from "@/lib/upload";
 import SentMessage from "./SentMessage";
 import ReceivedMessage from "./ReceivedMessage";
 
-function Chat() {
+function Chat({ className }) {
   const toast = useToast();
   const [chat, setChat] = useState();
   const [open, setOpen] = useState(false);
@@ -114,7 +114,9 @@ function Chat() {
   };
 
   return (
-    <div className="chat border-r-[1px] border-r-gray-400 flex-col flex">
+    <div
+      className={`chat border-r-[1px] border-r-gray-400 flex-col flex ${className}`}
+    >
       <div className="top p-2 flex justify-between border-b-[1px] border-b-gray-400">
         <div className="user flex items-center gap-4">
           <Avatar>

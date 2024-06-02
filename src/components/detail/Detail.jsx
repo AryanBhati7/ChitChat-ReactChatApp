@@ -18,7 +18,7 @@ import { useUserStore } from "@/store/userStore";
 import { useToast } from "@/components/ui/use-toast";
 import { onSnapshot } from "firebase/firestore";
 
-function Detail() {
+function Detail({ className }) {
   const [images, setImages] = React.useState([]);
   const { toast } = useToast();
   const {
@@ -71,7 +71,9 @@ function Detail() {
     resetChat();
   };
   return (
-    <div className="details flex-1 overflow-y-scroll scrollbar-custom">
+    <div
+      className={`details flex-1 overflow-y-scroll scrollbar-custom ${className}`}
+    >
       <div className="user flex flex-col p-3 gap-2 justify-center items-center border-b-[1px] border-b-gray-400 pb-2">
         <Avatar className="w-3/12 h-3/12">
           <AvatarImage

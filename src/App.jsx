@@ -38,8 +38,8 @@ function App() {
       {currentUser ? (
         <>
           <List />
-          {chatId && <Chat />}
-          {chatId && <Detail />}
+          {chatId && <Chat className="md:flex hidden" />}
+          {chatId && <Detail className="" />}
         </>
       ) : (
         <div className="flex gap-4 p-4 justify-evenly w-full items-center">
